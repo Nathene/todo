@@ -59,6 +59,7 @@ func createTables(db *sql.DB) {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		todo_id INTEGER NOT NULL,
 		name TEXT NOT NULL,
+		description TEXT NOT NULL,
 		done BOOLEAN NOT NULL DEFAULT false,
 		username TEXT NOT NULL, -- Username to identify the user
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
