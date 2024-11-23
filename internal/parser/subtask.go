@@ -1,4 +1,6 @@
-package service
+package parser
+
+import "time"
 
 type Subtask struct {
 	ID          int    `json:"id"`
@@ -6,4 +8,7 @@ type Subtask struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Done        bool   `json:"done"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

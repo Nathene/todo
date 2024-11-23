@@ -1,0 +1,297 @@
+{{ define "title" }}Group: {{ .GroupName }}{{ end }}
+{{ define "content" }}
+<div class="container mt-5">
+    <h2 class="mb-4 {{ if .darkMode }}text-white{{ else }}text-dark{{ end }}">Group: {{ .GroupName }}</h2>
+
+    <!-- Add New Todo List Button -->
+    <div class="text-end mb-4">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTodoModal">Add New Todo</button>
+    </div>
+
+    <!-- Urgent Todo Lists -->
+    <h3 class="mt-4 {{ if .darkMode }}text-danger{{ else }}text-dark{{ end }}">Urgent Tickets</h3>
+    <div class="row">
+        {{ range .TodoLists }}
+        {{ if and .Urgent (not .Done) }}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm {{ if $.darkMode }}bg-dark text-white border-secondary{{ else }}bg-light text-dark border-muted{{ end }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ .Name }}</h5>
+                    <p class="card-text">
+                        {{ if .Description }}
+                        <small>{{ .Description }}</small>
+                        {{ else }}
+                        <em>No description provided</em>
+                        {{ end }}
+                    </p>
+                    <p class="mb-2">
+                        Priority: 
+                        <form method="POST" action="/todos/{{ .ID }}/priority" class="d-inline">
+                            <select name="priority" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                                <option value="Low" {{ if eq .Priority "Low" }}selected{{ end }}>Low</option>
+                                <option value="Medium" {{ if eq .Priority "Medium" }}selected{{ end }}>Medium</option>
+                                <option value="High" {{ if eq .Priority "High" }}selected{{ end }}>High</option>
+                                <option value="Critical" {{ if eq .Priority "Critical" }}selected{{ end }}>Critical</option>
+                            </select>
+                        </form>
+                    </p>
+                    <p class="mb-2">
+                        Status: <span class="badge {{ statusColor .Status }}">{{ .Status }}</span>
+                    </p>
+                    <form method="POST" action="/todos/{{ .ID }}/status">
+                        <label for="statusSelect{{ .ID }}">Update Status:</label>
+                        <select name="status" id="statusSelect{{ .ID }}" class="form-select" onchange="this.form.submit()">
+                            <option value="Not Started" {{ if eq .Status "Not Started" }}selected{{ end }}>Not Started</option>
+                            <option value="In Progress" {{ if eq .Status "In Progress" }}selected{{ end }}>In Progress</option>
+                            <option value="Completed" {{ if eq .Status "Completed" }}selected{{ end }}>Completed</option>
+                        </select>
+                    </form>
+
+                <!-- Subtasks Section -->
+                <h6 class="mt-3">Subtasks:</h6>
+                <ul class="list-group mb-3">
+                    {{ range .Subtasks }}
+                    <li class="list-group-item subtask {{ if .Done }}done{{ end }}">
+                        <div>
+                            <strong>{{ .Name }}</strong>
+                            <br>
+                            <small>{{ .Description }}</small>
+                        </div>
+                        <form method="POST" action="/subtasks/{{ .ID }}/toggle">
+                            <input type="checkbox" 
+                            data-subtask-id="{{ .ID }}" 
+                            {{ if .Done }}checked{{ end }} 
+                            class="subtask-checkbox">
+
+                        </form>
+                    </li>
+                    {{ end }}
+                    {{ if not .Subtasks }}
+                    <li class="list-group-item">
+                        <em>No subtasks added yet</em>
+                    </li>
+                    {{ end }}
+                </ul>
+
+
+                <!-- Create Subtask Button -->
+                <div class="mb-3">
+                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#addSubtaskForm{{ .ID }}" aria-expanded="false" aria-controls="addSubtaskForm{{ .ID }}">
+                        Create Subtask
+                    </button>
+                </div>
+
+                <!-- Add Subtask Form (Initially Collapsed) -->
+                <div class="collapse" id="addSubtaskForm{{ .ID }}">
+                    <form method="POST" action="/todos/{{ .ID }}/subtasks">
+                        <div class="mb-3">
+                            <label for="subtaskName{{ .ID }}" class="form-label">Subtask Name</label>
+                            <input type="text" class="form-control" id="subtaskName{{ .ID }}" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subtaskDescription{{ .ID }}" class="form-label">Description</label>
+                            <textarea class="form-control" id="subtaskDescription{{ .ID }}" name="description" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Add Subtask</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {{ end }}
+        {{ end }}
+    </div>
+
+    <!-- Non-Urgent Todo Lists -->
+    <h3 class="mt-4 {{ if .darkMode }}text-white{{ else }}text-dark{{ end }}">Other Tickets</h3>
+    <div class="row">
+        {{ range .TodoLists }}
+        {{ if and (not .Urgent) (not .Done) }}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm {{ if $.darkMode }}bg-dark text-white border-secondary{{ else }}bg-light text-dark border-muted{{ end }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ .Name }}</h5>
+                    <p class="card-text">
+                        {{ if .Description }}
+                        <small>{{ .Description }}</small>
+                        {{ else }}
+                        <em>No description provided</em>
+                        {{ end }}
+                    </p>
+                    <p class="mb-2">
+                        Priority: 
+                        <form method="POST" action="/todos/{{ .ID }}/priority" class="d-inline">
+                            <select name="priority" class="form-select d-inline w-auto" onchange="this.form.submit()">
+                                <option value="Low" {{ if eq .Priority "Low" }}selected{{ end }}>Low</option>
+                                <option value="Medium" {{ if eq .Priority "Medium" }}selected{{ end }}>Medium</option>
+                                <option value="High" {{ if eq .Priority "High" }}selected{{ end }}>High</option>
+                                <option value="Critical" {{ if eq .Priority "Critical" }}selected{{ end }}>Critical</option>
+                            </select>
+                        </form>
+                    </p>
+                    <p class="mb-2">
+                        Status: <span class="badge {{ statusColor .Status }}">{{ .Status }}</span>
+                    </p>
+                    <form method="POST" action="/todos/{{ .ID }}/status">
+                        <label for="statusSelect{{ .ID }}">Update Status:</label>
+                        <select name="status" id="statusSelect{{ .ID }}" class="form-select" onchange="this.form.submit()">
+                            <option value="Not Started" {{ if eq .Status "Not Started" }}selected{{ end }}>Not Started</option>
+                            <option value="In Progress" {{ if eq .Status "In Progress" }}selected{{ end }}>In Progress</option>
+                            <option value="Completed" {{ if eq .Status "Completed" }}selected{{ end }}>Completed</option>
+                        </select>
+                    </form>
+
+                <!-- Subtasks Section -->
+                <h6 class="mt-3">Subtasks:</h6>
+                <ul class="list-group mb-3">
+                    {{ range .Subtasks }}
+                    <li class="list-group-item d-flex justify-content-between align-items-center 
+                        {{ if .Done }}bg-success text-white text-decoration-line-through{{ else }}bg-light text-dark{{ end }}">
+                        <div>
+                            <strong>{{ .Name }}</strong>
+                            <br>
+                            <small>{{ .Description }}</small>
+                        </div>
+                        <form method="POST" action="/subtasks/{{ .ID }}/toggle">
+                            <input type="checkbox" name="done" {{ if .Done }}checked{{ end }} onchange="this.form.submit()">
+                        </form>
+                    </li>
+                    {{ end }}
+                    {{ if not .Subtasks }}
+                    <li class="list-group-item bg-light text-muted">
+                        <em>No subtasks added yet</em>
+                    </li>
+                    {{ end }}
+                </ul>
+
+
+                <!-- Create Subtask Button -->
+                <div class="mb-3">
+                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#addSubtaskForm{{ .ID }}" aria-expanded="false" aria-controls="addSubtaskForm{{ .ID }}">
+                        Create Subtask
+                    </button>
+                </div>
+
+                <!-- Add Subtask Form (Initially Collapsed) -->
+                <div class="collapse" id="addSubtaskForm{{ .ID }}">
+                    <form method="POST" action="/todos/{{ .ID }}/subtasks">
+                        <div class="mb-3">
+                            <label for="subtaskName{{ .ID }}" class="form-label">Subtask Name</label>
+                            <input type="text" class="form-control" id="subtaskName{{ .ID }}" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subtaskDescription{{ .ID }}" class="form-label">Description</label>
+                            <textarea class="form-control" id="subtaskDescription{{ .ID }}" name="description" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Add Subtask</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {{ end }}
+        {{ end }}
+    </div>
+
+<!-- Done Tickets -->
+<h3 class="mt-4 {{ if .darkMode }}text-success{{ else }}text-dark{{ end }}">Done Tickets</h3>
+<div class="row">
+    {{ range .TodoLists }}
+    {{ if .Done }}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm {{ if $.darkMode }}bg-dark text-white border-secondary{{ else }}bg-light text-dark border-muted{{ end }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ .Name }}</h5>
+                <p class="card-text">
+                    {{ if .Description }}
+                    <small>{{ .Description }}</small>
+                    {{ else }}
+                    <em>No description provided</em>
+                    {{ end }}
+                </p>
+
+                <!-- Subtasks Section -->
+                <h6 class="mt-3">Subtasks:</h6>
+                <ul class="list-group mb-3">
+                    {{ range .Subtasks }}
+                    <li class="list-group-item d-flex justify-content-between align-items-center 
+                        {{ if $.darkMode }}bg-success text-white text-decoration-line-through{{ else }}bg-success text-white text-decoration-line-through{{ end }}">
+                        <div>
+                            <strong>{{ .Name }}</strong>
+                            <br>
+                            <small>{{ .Description }}</small>
+                        </div>
+                        <!-- No toggle for done subtasks -->
+                    </li>
+                    {{ end }}
+                    {{ if not .Subtasks }}
+                    <li class="list-group-item {{ if $.darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}">
+                        <em>No subtasks added yet</em>
+                    </li>
+                    {{ end }}
+                </ul>
+
+                <!-- Progress Update Form -->
+                <form method="POST" action="/todos/{{ .ID }}/status">
+                    <label for="statusSelect{{ .ID }}">Update Status:</label>
+                    <select name="status" id="statusSelect{{ .ID }}" class="form-select" onchange="this.form.submit()">
+                        <option value="Not Started" {{ if eq .Status "Not Started" }}selected{{ end }}>Not Started</option>
+                        <option value="In Progress" {{ if eq .Status "In Progress" }}selected{{ end }}>In Progress</option>
+                        <option value="Completed" {{ if eq .Status "Completed" }}selected{{ end }}>Completed</option>
+                    </select>
+                </form>
+
+                <!-- Delete Todo Button -->
+                <form method="POST" action="/todos/{{ .ID }}/delete" class="mt-3">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+    {{ end }}
+</div>
+
+
+
+<!-- Add Todo Modal -->
+<div class="modal fade" id="addTodoModal" tabindex="-1" aria-labelledby="addTodoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTodoModalLabel">Add New Todo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="/groups/{{ .GroupID }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="todoName" class="form-label">Todo Name</label>
+                        <input type="text" class="form-control" id="todoName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="todoDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="todoDescription" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="urgent" name="urgent">
+                        <label class="form-check-label" for="urgent">Mark as urgent</label>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Priority</label>
+                        <select class="form-select" id="priority" name="priority" required>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Todo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}

@@ -29,7 +29,6 @@ func InitDB() (*Database, error) {
 
 	return &Database{db}, nil
 }
-
 func createTables(db *sql.DB) {
 	_, err := db.Exec(`
 	CREATE TABLE IF NOT EXISTS todo_groups (
@@ -67,16 +66,17 @@ func createTables(db *sql.DB) {
 		FOREIGN KEY(todo_id) REFERENCES todo_lists(id)
 	);
 
-
+	CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		username VARCHAR(50) NOT NULL UNIQUE,
+		password VARCHAR(255) NOT NULL,
+		firstname VARCHAR(100) NOT NULL, -- Added first name
+		email VARCHAR(255) NOT NULL UNIQUE, -- Added email
+		darkmode BOOLEAN DEFAULT false,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	);
 	`)
 	if err != nil {
 		log.Fatalf("Failed to create tables: %v", err)
-	}
-}
-
-func (db *Database) Close() {
-	err := db.DB.Close()
-	if err != nil {
-		log.Fatalf("Failed to close the database: %v", err)
 	}
 }

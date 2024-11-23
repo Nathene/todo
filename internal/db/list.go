@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"todo/internal/service"
+	"todo/internal/parser"
 )
 
 func (db *Database) InsertList(groupID int, username string, req struct {
@@ -29,7 +29,7 @@ func (db *Database) InsertList(groupID int, username string, req struct {
 	return nil
 }
 
-func (db *Database) GetTodoLists(groupID int, username string) (*[]service.TodoList, error) {
+func (db *Database) GetTodoLists(groupID int, username string) (*[]parser.TodoList, error) {
 	log.Printf("Fetching todo lists for groupID: %d, username: %s", groupID, username)
 
 	// Execute the query
@@ -46,9 +46,9 @@ func (db *Database) GetTodoLists(groupID int, username string) (*[]service.TodoL
 	}
 	defer rows.Close()
 
-	var todoLists []service.TodoList
+	var todoLists []parser.TodoList
 	for rows.Next() {
-		var todoList service.TodoList
+		var todoList parser.TodoList
 		if err := rows.Scan(&todoList.ID, &todoList.Name, &todoList.Description, &todoList.Urgent, &todoList.Priority, &todoList.Status, &todoList.Done, &todoList.Created_at, &todoList.Updated_at); err != nil {
 			log.Printf("Row scan error for groupID '%d': %v", groupID, err)
 			return nil, &jsonErr{

@@ -1,0 +1,89 @@
+{{ define "title" }}Account Settings{{ end }}
+{{ define "content" }}
+<div class="container mt-5">
+    <h2 class="mb-4">Account Settings</h2>
+    
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="account-tab" data-bs-toggle="tab" data-bs-target="#account" type="button" role="tab" aria-controls="account" aria-selected="true">Account</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="privacy-tab" data-bs-toggle="tab" data-bs-target="#privacy" type="button" role="tab" aria-controls="privacy" aria-selected="false">Privacy</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="appearance-tab" data-bs-toggle="tab" data-bs-target="#appearance" type="button" role="tab" aria-controls="appearance" aria-selected="false">Appearance</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">Security</button>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content mt-4" id="settingsTabContent">
+        <!-- Account Tab -->
+        <div class="tab-pane fade show active p-4 rounded {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}" id="account" role="tabpanel" aria-labelledby="account-tab">
+            <h4 class="mb-4">Account Information</h4>
+            <form method="POST" action="/settings/update/firstname" class="mb-3">
+                <label for="firstname" class="form-label">First Name</label>
+                <input type="text" id="firstname" name="firstname" value="{{ .firstname }}" class="form-control">
+                <button type="submit" class="btn btn-primary mt-2">Update First Name</button>
+            </form>
+            <form method="POST" action="/settings/update/username" class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" value="{{ .username }}" class="form-control">
+                <button type="submit" class="btn btn-primary mt-2">Update Username</button>
+            </form>
+            <form method="POST" action="/settings/update/email" class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" value="{{ .email }}" class="form-control">
+                <button type="submit" class="btn btn-primary mt-2">Update Email</button>
+            </form>
+        </div>
+        
+        <!-- Privacy Tab -->
+        <div class="tab-pane fade p-4 rounded {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}" id="privacy" role="tabpanel" aria-labelledby="privacy-tab">
+            <h4 class="mb-4">Privacy Settings</h4>
+            <p>Here you can adjust your privacy settings.</p>
+        </div>
+        
+        <!-- Appearance Tab -->
+        <div class="tab-pane fade p-4 rounded {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}" id="appearance" role="tabpanel" aria-labelledby="appearance-tab">
+            <h4 class="mb-4">Appearance Settings</h4>
+            <form method="POST" action="/settings/update/darkmode">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="darkModeToggle" name="darkMode" {{ if .darkMode }}checked{{ end }}>
+                    <label class="form-check-label" for="darkModeToggle">Enable Dark Mode</label>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Save Appearance</button>
+            </form>
+        </div>
+        
+        <!-- Security Tab -->
+        <div class="tab-pane fade p-4 rounded {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}" id="security" role="tabpanel" aria-labelledby="security-tab">
+            <h4 class="mb-4">Security Settings</h4>
+            <form method="POST" action="/settings/update/password" class="mb-3">
+                <label for="currentPassword" class="form-label">Current Password</label>
+                <input type="password" id="currentPassword" name="currentPassword" class="form-control">
+                <label for="newPassword" class="form-label mt-3">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" class="form-control">
+                <button type="submit" class="btn btn-primary mt-3">Change Password</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Account Management -->
+    <div class="mt-4">
+        <h4 class="text-danger">Account Management</h4>
+        <a href="/delete-account" class="btn btn-danger">Delete Account</a>
+    </div>
+</div>
+
+{{/* <script>
+    // Dark mode toggle script
+    document.getElementById('darkModeToggle').addEventListener('change', function() {
+        document.body.classList.toggle('bg-dark', this.checked);
+        document.body.classList.toggle('text-white', this.checked);
+    });
+</script> */}}
+{{ end }}

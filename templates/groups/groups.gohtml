@@ -1,0 +1,81 @@
+{{ define "title" }}Your Groups{{ end }}
+{{ define "content" }}
+<div class="container mt-5">
+    <h2 class="mb-4 {{ if .darkMode }}text-white{{ else }}text-dark{{ end }}">Your Groups</h2>
+    <div class="row">
+        <!-- Create New Group Card -->
+        <div class="col-md-4 mb-3">
+            <div 
+                class="card h-100 border-0 shadow-sm group-tile {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}" 
+                role="button" 
+                data-bs-toggle="modal" 
+                data-bs-target="#createGroupModal">
+                <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                    <i class="fas fa-plus-circle fa-3x mb-3"></i>
+                    <h5 class="card-title">Create New Group</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Existing Groups -->
+        {{ range .Groups }}
+        <div class="col-md-4 mb-3">
+            <a 
+                href="/groups/{{ .id }}" 
+                class="text-decoration-none">
+                <div class="card h-100 border-0 shadow-sm group-tile {{ if $.darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}">
+                    <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                        <h3 class="card-title">{{ .name }}</h5>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+<style>
+    .group-tile {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* Light Mode Shadow */
+    .group-tile:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Dark Mode Shadow */
+    body.dark-mode .group-tile:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1); /* Softer, lighter shadow */
+    }
+</style>
+
+
+
+
+<!-- Create Group Modal -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content {{ if .darkMode }}bg-dark text-white{{ else }}bg-light text-dark{{ end }}">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createGroupModalLabel">Create New Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="/groups">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="groupName" class="form-label">Group Name</label>
+                        <input type="text" class="form-control" id="groupName" name="name" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{{ end }}

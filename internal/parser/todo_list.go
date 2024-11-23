@@ -1,4 +1,4 @@
-package service
+package parser
 
 import "time"
 
@@ -9,7 +9,7 @@ type TodoList struct {
 	Description string    `json:"description"`
 	Tasks       []string  `json:"tasks"`
 	Urgent      bool      `json:"urgent"`
-	Priority    int       `json:"priority"`
+	Priority    string    `json:"priority"`
 	Subtasks    []Subtask `json:"subtasks"`
 
 	Status string `json:"status"`

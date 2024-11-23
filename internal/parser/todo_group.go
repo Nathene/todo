@@ -1,4 +1,4 @@
-package service
+package parser
 
 type TodoGroup struct {
 	ID       int         `json:"id"`
