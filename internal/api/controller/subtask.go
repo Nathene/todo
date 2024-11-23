@@ -17,13 +17,11 @@ type subtaskReq struct {
 
 func CreateSubtask(db *db.Database) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Extract username
 		username, ok := c.Get("username").(string)
 		if !ok || username == "" {
 			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
 		}
 
-		// Extract todo ID
 		todoIDParam := c.Param("todo_id")
 		todoID, err := strconv.Atoi(todoIDParam)
 		if err != nil {
@@ -57,7 +55,10 @@ func CreateSubtask(db *db.Database) echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create subtask"})
 		}
 
-		// Redirect back to the referring page
+		// Debug log for confirmation
+		fmt.Printf("Subtask created: todoID=%d, name=%s, username=%s\n", todoID, req.Name, username)
+
+		// Redirect back to the referring page or re-render subtasks
 		return util.BackPage(c)
 	}
 }

@@ -39,3 +39,12 @@ func (db *Database) GetSubtasksByTodoID(todoID int) ([]parser.Subtask, error) {
 	}
 	return subtasks, nil
 }
+
+func (db *Database) AreAllSubtasksDone(todoID int) (bool, error) {
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM subtasks WHERE todo_id = ? AND done = 0", todoID).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("failed to check subtasks for todo: %v", err)
+	}
+	return count == 0, nil
+}
