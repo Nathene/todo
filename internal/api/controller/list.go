@@ -195,10 +195,11 @@ func GetTodoListsByGroupID(db *db.Database) echo.HandlerFunc {
 			if err := rows.Scan(
 				&todoList.ID, &todoList.Name, &todoList.Username, &todoList.Description,
 				&todoList.Urgent, &todoList.Priority, &todoList.Status, &todoList.Done,
-				&todoList.Created_at, &todoList.Updated_at,
+				&todoList.CreatedAt, &todoList.UpdatedAt,
 			); err != nil {
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to parse todo lists"})
 			}
+			todoList.Done = (todoList.Status == "Completed")
 
 			// Fetch subtasks for each todo list
 			subtaskRows, err := db.Query(
@@ -209,7 +210,6 @@ func GetTodoListsByGroupID(db *db.Database) echo.HandlerFunc {
 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch subtasks"})
 			}
 			defer subtaskRows.Close()
-
 			for subtaskRows.Next() {
 				var subtask parser.Subtask
 				if err := subtaskRows.Scan(
@@ -239,32 +239,22 @@ func GetTodoListsByGroupID(db *db.Database) echo.HandlerFunc {
 
 func UpdateTodoStatus(db *db.Database) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user, ok := c.Get("user").(parser.User)
-		if !ok {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
-		}
-
 		todoID := c.Param("id")
-		if todoID == "" {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Todo ID is required"})
-		}
-
 		status := c.FormValue("status")
-		if status == "" {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "Status is required"})
-		}
 
+		// Ensure `done` is updated based on the status
 		_, err := db.Exec(
-			"UPDATE todo_lists SET status = ?, done = ? WHERE id = ? AND username = ?",
-			status, status == "Completed", todoID, user.Username,
+			"UPDATE todo_lists SET status = ?, done = ? WHERE id = ?",
+			status, status == "Completed", todoID,
 		)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update status"})
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update todo status"})
 		}
 
+		// Redirect back to the referring page
 		referer := c.Request().Header.Get("Referer")
 		if referer == "" {
-			referer = "/" // Default to homepage
+			referer = "/" // Fallback
 		}
 		return c.Redirect(http.StatusSeeOther, referer)
 	}
@@ -328,5 +318,82 @@ func DeleteTodo(db *db.Database) echo.HandlerFunc {
 			referer = "/" // Default to homepage
 		}
 		return c.Redirect(http.StatusSeeOther, referer)
+	}
+}
+
+func GetEditTodoPage(db *db.Database) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		todoID := c.Param("id")
+		user := c.Get("user").(parser.User)
+		// Query the todo details
+		var todo struct {
+			ID          int
+			Name        string
+			Description string
+			Priority    string
+			Status      string
+		}
+		err := db.QueryRow(
+			"SELECT id, name, description, priority, status FROM todo_lists WHERE id = ?", todoID,
+		).Scan(&todo.ID, &todo.Name, &todo.Description, &todo.Priority, &todo.Status)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": "Todo not found"})
+		}
+
+		// Query subtasks for the todo
+		rows, err := db.Query("SELECT id, name, description, done FROM subtasks WHERE todo_id = ?", todoID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch subtasks"})
+		}
+		defer rows.Close()
+
+		var subtasks []parser.Subtask
+		for rows.Next() {
+			var subtask parser.Subtask
+			err := rows.Scan(&subtask.ID, &subtask.Name, &subtask.Description, &subtask.Done)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to parse subtasks"})
+			}
+			subtasks = append(subtasks, subtask)
+		}
+
+		// Render the page
+		return c.Render(http.StatusOK, "edit_list/edit_list.gohtml", map[string]interface{}{
+			"Todo":       todo,
+			"Subtasks":   subtasks,
+			"darkMode":   c.Get("darkMode"),
+			"isLoggedIn": user.IsLoggedIn,
+		})
+	}
+}
+
+func UpdateTodoDetails(db *db.Database) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		todoID := c.Param("id") // Extract todo ID from the URL
+
+		// Extract updated fields from form values
+		name := c.FormValue("name")
+		description := c.FormValue("description")
+		priority := c.FormValue("priority")
+		status := c.FormValue("status")
+
+		// Update the todo in the database
+		_, err := db.Exec(
+			"UPDATE todo_lists SET name = ?, description = ?, priority = ?, status = ? WHERE id = ?",
+			name, description, priority, status, todoID,
+		)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update todo"})
+		}
+
+		// Fetch GroupID to redirect back to the group
+		var groupID string
+		err = db.QueryRow("SELECT group_id FROM todo_lists WHERE id = ?", todoID).Scan(&groupID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch GroupID"})
+		}
+
+		// Redirect back to the group page
+		return c.Redirect(http.StatusSeeOther, "/groups/"+groupID)
 	}
 }

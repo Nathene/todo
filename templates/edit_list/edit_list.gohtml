@@ -1,0 +1,79 @@
+{{ define "content" }}
+<div class="container mt-5">
+    <h2 class="mb-4 {{ if .darkMode }}text-white{{ else }}text-dark{{ end }}">Edit Todo: {{ .Todo.Name }}</h2>
+
+    <!-- Edit Todo Form -->
+    <form id="updateTodoForm" method="POST" action="/todos/{{ .Todo.ID }}/update">
+        <div class="mb-3">
+            <label for="name" class="form-label">Todo Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ .Todo.Name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ .Todo.Description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="priority" class="form-label">Priority</label>
+            <select class="form-select" id="priority" name="priority">
+                <option value="Low" {{ if eq .Todo.Priority "Low" }}selected{{ end }}>Low</option>
+                <option value="Medium" {{ if eq .Todo.Priority "Medium" }}selected{{ end }}>Medium</option>
+                <option value="High" {{ if eq .Todo.Priority "High" }}selected{{ end }}>High</option>
+                <option value="Critical" {{ if eq .Todo.Priority "Critical" }}selected{{ end }}>Critical</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+                <option value="Not Started" {{ if eq .Todo.Status "Not Started" }}selected{{ end }}>Not Started</option>
+                <option value="In Progress" {{ if eq .Todo.Status "In Progress" }}selected{{ end }}>In Progress</option>
+                <option value="Completed" {{ if eq .Todo.Status "Completed" }}selected{{ end }}>Completed</option>
+            </select>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-primary">Update and Go Back</button>
+        </div>
+    </form>
+
+    <!-- Subtasks Section -->
+    <h3 class="mt-5">Subtasks</h3>
+    <ul class="list-group mb-4">
+        {{ range .Subtasks }}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ .Name }}</strong>
+                <br>
+                <small>{{ .Description }}</small>
+            </div>
+            <form method="POST" action="/subtasks/{{ .ID }}/toggle" class="d-inline">
+                <button type="submit" class="btn btn-sm {{ if .Done }}btn-success{{ else }}btn-outline-success{{ end }}">
+                    {{ if .Done }}Mark Incomplete{{ else }}Mark Complete{{ end }}
+                </button>
+            </form>
+        </li>
+        {{ end }}
+        {{ if not .Subtasks }}
+        <li class="list-group-item text-muted">No subtasks added yet.</li>
+        {{ end }}
+    </ul>
+
+    <!-- Add Subtask Dropdown -->
+    <button class="btn btn-secondary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#addSubtaskForm" aria-expanded="false" aria-controls="addSubtaskForm">
+        Add Subtask
+    </button>
+    <div class="collapse" id="addSubtaskForm">
+        <form method="POST" action="/todos/{{ .Todo.ID }}/subtasks">
+            <div class="mb-3">
+                <label for="subtaskName" class="form-label">Subtask Name</label>
+                <input type="text" class="form-control" id="subtaskName" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="subtaskDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="subtaskDescription" name="description" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Subtask</button>
+        </form>
+    </div>
+</div>
+{{ end }}

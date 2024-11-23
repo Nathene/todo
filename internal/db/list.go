@@ -49,7 +49,7 @@ func (db *Database) GetTodoLists(groupID int, username string) (*[]parser.TodoLi
 	var todoLists []parser.TodoList
 	for rows.Next() {
 		var todoList parser.TodoList
-		if err := rows.Scan(&todoList.ID, &todoList.Name, &todoList.Description, &todoList.Urgent, &todoList.Priority, &todoList.Status, &todoList.Done, &todoList.Created_at, &todoList.Updated_at); err != nil {
+		if err := rows.Scan(&todoList.ID, &todoList.Name, &todoList.Description, &todoList.Urgent, &todoList.Priority, &todoList.Status, &todoList.Done, &todoList.CreatedAt, &todoList.UpdatedAt); err != nil {
 			log.Printf("Row scan error for groupID '%d': %v", groupID, err)
 			return nil, &jsonErr{
 				StatusCode: http.StatusInternalServerError,

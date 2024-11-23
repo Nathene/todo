@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"net/http"
 	"todo/internal/api/controller"
 	"todo/internal/api/controller/account"
 	"todo/internal/api/controller/settings"
@@ -13,6 +14,10 @@ import (
 func Handle(e *echo.Echo, db *db.Database) {
 	// Public routes
 	e.GET("/", controller.LandingPage(), controller.AuthMiddleware(db))
+
+	e.GET("/favicon.ico", func(c echo.Context) error {
+		return c.NoContent(http.StatusNoContent)
+	})
 
 	e.GET("/login", controller.Login(db))
 	e.POST("/login", controller.Login(db))
@@ -43,12 +48,16 @@ func Handle(e *echo.Echo, db *db.Database) {
 	protected.POST("/todos/:id/status", controller.UpdateTodoStatus(db))
 	protected.POST("/todos/:id/priority", controller.UpdateTodoPriority(db))
 	protected.POST("/todos/:id/delete", controller.DeleteTodo(db))
+	protected.GET("/todos/:id/edit", controller.GetEditTodoPage(db))
+	protected.POST("/todos/:id/update", controller.UpdateTodoDetails(db))
+	protected.GET("/todos/:id/update", controller.UpdateTodoDetails(db))
 
 	// protected.GET("/groups/:name", controller.GetTodoListsByGroupName(db))
 	// protected.POST("/groups/:name", controller.AddTodoListToGroup(db))
 	protected.POST("/todos/:todo_id/subtasks", controller.CreateSubtask(db))
 
 	protected.POST("/subtasks/:id/toggle", subtask.ToggleSubtaskDone(db))
+	protected.GET("/subtasks/:id/toggle", subtask.ToggleSubtaskDone(db))
 	// Subtasks
 	protected.POST("/groups/:group_name/:todo_id", controller.CreateSubtask(db))
 	protected.GET("/groups/:group_name/:todo_id", controller.GetSubtasks(db))

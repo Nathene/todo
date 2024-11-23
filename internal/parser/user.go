@@ -7,6 +7,7 @@ import (
 type User struct {
 	Username   string
 	FirstName  string
+	GroupID    int
 	Email      string
 	DarkMode   bool
 	IsLoggedIn bool

@@ -11,10 +11,10 @@ type TodoList struct {
 	Urgent      bool      `json:"urgent"`
 	Priority    string    `json:"priority"`
 	Subtasks    []Subtask `json:"subtasks"`
+	GroupID     int       `json:"group_id"`
+	Status      string    `json:"status"`
+	Done        bool      `json:"done"`
 
-	Status string `json:"status"`
-	Done   bool   `json:"done"`
-
-	Created_at time.Time `json:"created_at"`
-	Updated_at time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
