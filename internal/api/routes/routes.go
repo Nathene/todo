@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"todo/internal/api/controller"
 	"todo/internal/api/controller/account"
+	"todo/internal/api/controller/calendar"
 	"todo/internal/api/controller/settings"
 	"todo/internal/api/controller/subtask"
+	"todo/internal/api/notes"
 	"todo/internal/db"
 
 	"github.com/labstack/echo/v4"
@@ -13,7 +15,7 @@ import (
 
 func Handle(e *echo.Echo, db *db.Database) {
 	// Public routes
-	e.GET("/", controller.LandingPage(), controller.AuthMiddleware(db))
+	e.GET("/", controller.Dashboard(db), controller.AuthMiddleware(db))
 
 	e.GET("/favicon.ico", func(c echo.Context) error {
 		return c.NoContent(http.StatusNoContent)
@@ -50,15 +52,22 @@ func Handle(e *echo.Echo, db *db.Database) {
 	protected.POST("/todos/:id/delete", controller.DeleteTodo(db))
 	protected.GET("/todos/:id/edit", controller.GetEditTodoPage(db))
 	protected.POST("/todos/:id/update", controller.UpdateTodoDetails(db))
-	protected.GET("/todos/:id/update", controller.UpdateTodoDetails(db))
 
-	// protected.GET("/groups/:name", controller.GetTodoListsByGroupName(db))
-	// protected.POST("/groups/:name", controller.AddTodoListToGroup(db))
-	protected.POST("/todos/:todo_id/subtasks", controller.CreateSubtask(db))
-
-	protected.POST("/subtasks/:id/toggle", subtask.ToggleSubtaskDone(db))
-	protected.GET("/subtasks/:id/toggle", subtask.ToggleSubtaskDone(db))
 	// Subtasks
+	protected.POST("/todos/:todo_id/subtasks", controller.CreateSubtask(db))
+	protected.POST("/subtasks/:id/toggle", subtask.ToggleSubtaskDone(db))
 	protected.POST("/groups/:group_name/:todo_id", controller.CreateSubtask(db))
 	protected.GET("/groups/:group_name/:todo_id", controller.GetSubtasks(db))
+
+	// Calendar
+	protected.GET("/calendar", calendar.GetAll(db))
+	protected.POST("/calendar/add", calendar.AddEvent(db))
+
+	// Notes
+	protected.GET("/notes", notes.GetNotes(db))
+	protected.GET("/notes/:id/edit", notes.EditNotePage(db))
+	protected.POST("/notes/:id/edit", notes.UpdateNote(db))
+	protected.POST("/notes/:id/delete", notes.DeleteNote(db))
+	protected.POST("/notes/add", notes.AddNote(db))
+
 }

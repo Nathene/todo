@@ -109,3 +109,55 @@ func DebugGroupTodoLists(db *sql.DB, groupName, username string) {
 	}
 	fmt.Println(strings.Repeat("=", 100))
 }
+
+func DebugEventsTable(db *sql.DB) {
+	fmt.Println("\n=== Debug: events Table ===")
+	rows, err := db.Query("SELECT id, name, description, event_date, created_at FROM events ORDER BY event_date ASC")
+	if err != nil {
+		log.Printf("Failed to query events: %v\n", err)
+		return
+	}
+	defer rows.Close()
+
+	fmt.Printf("%-5s %-20s %-30s %-15s %-20s\n", "ID", "Name", "Description", "Event Date", "Created At")
+	fmt.Println(strings.Repeat("-", 100))
+	for rows.Next() {
+		var id sql.NullInt64
+		var name, description sql.NullString
+		var eventDate, createdAt sql.NullString
+
+		if err := rows.Scan(&id, &name, &description, &eventDate, &createdAt); err != nil {
+			log.Printf("Failed to scan events row: %v\n", err)
+			continue
+		}
+
+		// Handle NULL values and display appropriately
+		idStr := "NULL"
+		if id.Valid {
+			idStr = fmt.Sprintf("%d", id.Int64)
+		}
+
+		nameStr := "NULL"
+		if name.Valid {
+			nameStr = name.String
+		}
+
+		descriptionStr := "NULL"
+		if description.Valid {
+			descriptionStr = description.String
+		}
+
+		eventDateStr := "NULL"
+		if eventDate.Valid {
+			eventDateStr = eventDate.String
+		}
+
+		createdAtStr := "NULL"
+		if createdAt.Valid {
+			createdAtStr = createdAt.String
+		}
+
+		fmt.Printf("%-5s %-20s %-30s %-15s %-20s\n", idStr, nameStr, descriptionStr, eventDateStr, createdAtStr)
+	}
+	fmt.Println(strings.Repeat("=", 100))
+}

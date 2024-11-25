@@ -3,6 +3,7 @@ package util
 import (
 	"log"
 	"net/http"
+	"todo/internal/parser"
 
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/cases"
@@ -44,4 +45,19 @@ func BackPage(c echo.Context) error {
 		referer = "/" // Default to the homepage if no referer
 	}
 	return c.Redirect(http.StatusSeeOther, referer)
+}
+
+// GetUserFromContext retrieves the logged-in user from the context.
+func GetUserFromContext(c echo.Context) (parser.User, bool) {
+	user, ok := c.Get("user").(parser.User)
+	return user, ok
+}
+
+// RequireLogin checks if the user is logged in, otherwise redirects to login.
+func RequireLogin(c echo.Context) error {
+	user, ok := GetUserFromContext(c)
+	if !ok || !user.IsLoggedIn {
+		return c.Redirect(http.StatusFound, "/login")
+	}
+	return nil
 }

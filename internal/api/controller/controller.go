@@ -6,6 +6,7 @@ import (
 	"time"
 	"todo/internal/db"
 	"todo/internal/parser"
+	"todo/internal/util"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -148,23 +149,23 @@ func AuthMiddleware(db *db.Database) echo.MiddlewareFunc {
 // ToggleDarkMode toggles the user's dark mode preference.
 func ToggleDarkMode(db *db.Database) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user, ok := c.Get("user").(parser.User)
-		if !ok {
-			return c.Redirect(http.StatusFound, "/login") // Use 302 for redirect
+		// Require user to be logged in
+		if err := util.RequireLogin(c); err != nil {
+			return err
 		}
-		// Toggle dark mode preference
+
+		user, _ := util.GetUserFromContext(c) // Safe to assume user exists after RequireLogin
 		user.DarkMode = !user.DarkMode
 
-		// Update the preference in the database
 		_, err := db.Exec("UPDATE users SET darkmode = ? WHERE username = ?", user.DarkMode, user.Username)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to update dark mode setting"})
 		}
-		// Redirect to the previous page
+
 		referer := c.Request().Header.Get("Referer")
 		if referer == "" {
-			referer = "/" // Default to the homepage if no referer
+			referer = "/" // Default to homepage
 		}
-		return c.Redirect(303, referer)
+		return c.Redirect(http.StatusSeeOther, referer)
 	}
 }

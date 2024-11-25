@@ -27,9 +27,11 @@
                     <li class="nav-item">
                         <a class="nav-link fs-5 fw-bold {{ if .darkMode }}text-light{{ else }}text-dark{{ end }}" href="/calendar">Calendar</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5 fw-bold {{ if .darkMode }}text-light{{ else }}text-dark{{ end }}" href="/notes">Notes</a>
+                    </li>
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
-
                     {{ if .isLoggedIn }}
                     <li class="nav-item">
                         <form method="POST" action="/darkmode" class="d-inline">
@@ -59,6 +61,7 @@
             </div>
         </div>
     </nav>
+
 
     <!-- Main Content -->
     <main class="container my-5">

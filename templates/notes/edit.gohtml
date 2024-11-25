@@ -1,0 +1,20 @@
+{{ define "content" }}
+<div class="container mt-5">
+    <h2 class="mb-4 {{ if .darkMode }}text-white{{ else }}text-dark{{ end }}">Edit Note</h2>
+
+    <form method="POST" action="/notes/{{ .Note.ID }}/edit">
+        <div class="mb-3">
+            <label for="noteTitle" class="form-label">Title</label>
+            <input type="text" class="form-control" id="noteTitle" name="title" value="{{ .Note.Title }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="noteContent" class="form-label">Content</label>
+            <textarea class="form-control" id="noteContent" name="content" rows="5">{{ .Note.Content }}</textarea>
+        </div>
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="/notes" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{{ end }}
