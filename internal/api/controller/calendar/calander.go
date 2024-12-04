@@ -1,6 +1,7 @@
 package calendar
 
 import (
+	"math"
 	"net/http"
 	"time"
 	"todo/internal/db"
@@ -9,40 +10,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 )
-
-// func AddPage(db *db.Database) echo.HandlerFunc {
-// 	return func(c echo.Context) error {
-// 		rows, err := db.Query("SELECT id, name, description, event_date FROM events ORDER BY event_date ASC")
-// 		if err != nil {
-// 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to fetch events"})
-// 		}
-// 		defer rows.Close()
-
-// 		var events []map[string]interface{}
-// 		today := time.Now()
-// 		for rows.Next() {
-// 			var event parser.Event
-// 			if err := rows.Scan(&event.ID, &event.Name, &event.Description, &event.EventDate); err != nil {
-// 				return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to parse events"})
-// 			}
-
-// 			eventDate, _ := time.Parse("2006-01-02", event.EventDate.String())
-// 			daysLeft := int(eventDate.Sub(today).Hours() / 24)
-
-// 			events = append(events, map[string]interface{}{
-// 				"id":          event.ID,
-// 				"name":        event.Name,
-// 				"description": event.Description,
-// 				"event_date":  event.EventDate,
-// 				"days_left":   daysLeft,
-// 			})
-// 		}
-
-// 		return c.Render(http.StatusOK, "calendar/calendar_create.gohtml", map[string]interface{}{
-// 			"Events": events,
-// 		})
-// 	}
-// }
 
 func AddEvent(db *db.Database) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -102,7 +69,7 @@ func GetAll(db *db.Database) echo.HandlerFunc {
 			}
 
 			// Calculate days left
-			event.DaysLeft = int(time.Until(event.EventDate).Hours() / 24)
+			event.DaysLeft = int(math.Ceil(time.Until(event.EventDate).Hours() / 24))
 			events = append(events, event)
 		}
 

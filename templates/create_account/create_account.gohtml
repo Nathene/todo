@@ -1,8 +1,8 @@
 {{ define "title" }}Create Account{{ end }}
 {{ define "content" }}
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-12 col-md-6 col-lg-6"> <!-- Adjust width to 50% for larger screens -->
-        <div class="card shadow">
+    <div class="col-12 col-md-6 col-lg-6">
+        <div class="card shadow {{ if .darkMode }}bg-dark text-light{{ else }}bg-light text-dark{{ end }}">
             <div class="card-header bg-primary text-white text-center">
                 <h4>Create an Account</h4>
             </div>
@@ -30,7 +30,12 @@
                     <button type="submit" class="btn btn-primary w-100">Create Account</button>
                 </form>
 
-                <p class="text-center mt-3">Already have an account? <a href="/login">Log in here</a>.</p>
+                <p class="text-center mt-3 {{ if .darkMode }}text-light{{ else }}text-dark{{ end }}">
+                    Already have an account? 
+                    <a href="/login" class="{{ if .darkMode }}text-info{{ else }}text-primary{{ end }}">
+                        Log in here
+                    </a>.
+                </p>
             </div>
         </div>
     </div>

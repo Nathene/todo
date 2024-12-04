@@ -4,13 +4,8 @@
 
     <!-- Welcome Message -->
     <h1 class="mb-4">
-        {{ if .isLoggedIn }}
-        Welcome, {{ .username }}!
-        {{ else }}
-        Welcome to My App
-        {{ end }}
+        Welcome, {{ .firstName }}!
     </h1>
-    {{ if .isLoggedIn }}
     <p class="mb-4">Here's a snapshot of your upcoming week:</p>
 
     <!-- Upcoming Calendar Events -->
@@ -22,11 +17,9 @@
             <p class="mb-1">{{ .Description }}</p>
             <small>Due in {{ .DaysLeft }} days ({{ .EventDate.Format "2006-01-02" }})</small>
         </div>
-        {{ else }}
         <div class="list-group-item text-center">
             <em>No events coming up this week.</em>
         </div>
-        {{ end }}
     </div>
 
     <!-- Groups with Urgent Tickets -->

@@ -41,6 +41,7 @@
         </div>
     </div>
 
+
     <!-- List of Upcoming Events -->
     <h3 class="mt-5">Upcoming Events</h3>
     <ul class="list-group">
@@ -54,7 +55,7 @@
                 <br>
                 <span class="text-muted">Date: {{ .EventDate.Format "2006-01-02" }}</span>
             </div>
-            <span class="badge bg-primary">
+            <span class="badge {{ if le .DaysLeft 7 }}bg-danger{{ else }}bg-primary{{ end }}">
                 {{ .DaysLeft }} days left
             </span>
         </li>

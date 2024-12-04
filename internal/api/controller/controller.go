@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"net/http"
 	"time"
 	"todo/internal/db"
@@ -98,7 +97,6 @@ func Logout() echo.HandlerFunc {
 func AuthMiddleware(db *db.Database) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			log.Println("AuthMiddleware executed")
 			// Default user context
 			c.Set("user", parser.User{IsLoggedIn: false})
 
@@ -139,7 +137,6 @@ func AuthMiddleware(db *db.Database) echo.MiddlewareFunc {
 			c.Set("user", user)
 			c.Set("username", user.Username)
 			c.Set("darkMode", user.DarkMode)
-
 			c.Logger().Infof("Authenticated user: %s", user.Username)
 			return next(c)
 		}

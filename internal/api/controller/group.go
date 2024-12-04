@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"todo/internal/db"
 	"todo/internal/parser"
+	"todo/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
@@ -40,9 +41,13 @@ func CreateTodoGroup(db *db.Database) echo.HandlerFunc {
 
 func GetTodoGroups(db *db.Database) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user, ok := c.Get("user").(parser.User)
+		if err := util.RequireLogin(c); err != nil {
+			return err
+		}
+
+		user, ok := util.GetUserFromContext(c)
 		if !ok {
-			return c.Redirect(http.StatusUnauthorized, "/login")
+			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized: user not found"})
 		}
 
 		rows, err := db.Query(`SELECT id, name FROM todo_groups WHERE username = ?`, user.Username)

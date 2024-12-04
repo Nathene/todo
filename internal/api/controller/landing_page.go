@@ -5,6 +5,7 @@ import (
 	"time"
 	"todo/internal/db"
 	"todo/internal/parser"
+	"todo/internal/util"
 
 	"github.com/labstack/echo/v4"
 )
@@ -81,7 +82,7 @@ func Dashboard(db *db.Database) echo.HandlerFunc {
 		return c.Render(http.StatusOK, "landing/landing.gohtml", map[string]interface{}{
 			"darkMode":                user.DarkMode,
 			"isLoggedIn":              user.IsLoggedIn,
-			"username":                user.Username,
+			"firstName":               util.Capitalize(user.FirstName),
 			"UpcomingEvents":          upcomingEvents,
 			"GroupsWithUrgentTickets": groupsWithUrgentTickets,
 		})
