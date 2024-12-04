@@ -49,9 +49,5 @@
         <a href="/calendar" class="btn {{ if .darkMode }}btn-info text-dark{{ else }}btn-secondary text-white{{ end }} mx-1">View Calendar</a>
         <a href="/notes" class="btn {{ if .darkMode }}btn-info text-dark{{ else }}btn-success text-white{{ end }} mx-1">View Notes</a>
     </div>
-
-    {{ else }}
-    <p>Please <a href="/login" class="{{ if .darkMode }}text-info{{ else }}text-primary{{ end }}">log in</a> to access your account.</p>
-    {{ end }}
 </div>
 {{ end }}
