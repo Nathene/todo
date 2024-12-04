@@ -39,52 +39,52 @@ I wanted some aspects of Jira, some aspects of a project used at my university w
 To run the application locally, clone and then use this as an example main.go.
 
 ```golang
-   package main
+package main
 
-    import (
-        "log"
-        "os"
-        "todo/internal/api/routes"
-        "todo/internal/db"
-        "todo/internal/pkg/renderer"
-        "todo/internal/util"
+import (
+    "log"
+    "os"
+    "todo/internal/api/routes"
+    "todo/internal/db"
+    "todo/internal/pkg/renderer"
+    "todo/internal/util"
 
-        "github.com/labstack/echo/v4"
-        "github.com/labstack/echo/v4/middleware"
-    )
+    "github.com/labstack/echo/v4"
+    "github.com/labstack/echo/v4/middleware"
+)
 
-    const (
-        port = "8040"
-    )
+const (
+    port = "8040"
+)
 
-    func main() {
-        // Initialize the database
-        db, err := db.InitDB()
-        if err != nil {
-            log.Fatal(err)
-        }
-        defer util.Defer(db.Close)
-
-        // Create a new Echo instance
-        e := echo.New()
-
-        // Initialize the custom renderer with the templates directory
-        e.Renderer = renderer.NewRenderer("templates")
-
-        // Serve static files like styles.css
-        e.Static("/static", "templates/static")
-
-        // Set up logging to stdout
-        e.Logger.SetOutput(os.Stdout)
-        e.Use(middleware.Logger()) // Enable request logging middleware
-
-        // Recover from panics
-        e.Use(middleware.Recover())
-
-        // Set up routes
-        routes.Handle(e, db)
-
-        // Start the server
-        e.Logger.Fatal(e.Start(":" + port))
+func main() {
+    // Initialize the database
+    db, err := db.InitDB()
+    if err != nil {
+        log.Fatal(err)
     }
+    defer util.Defer(db.Close)
+
+    // Create a new Echo instance
+    e := echo.New()
+
+    // Initialize the custom renderer with the templates directory
+    e.Renderer = renderer.NewRenderer("templates")
+
+    // Serve static files like styles.css
+    e.Static("/static", "templates/static")
+
+    // Set up logging to stdout
+    e.Logger.SetOutput(os.Stdout)
+    e.Use(middleware.Logger()) // Enable request logging middleware
+
+    // Recover from panics
+    e.Use(middleware.Recover())
+
+    // Set up routes
+    routes.Handle(e, db)
+
+    // Start the server
+    e.Logger.Fatal(e.Start(":" + port))
+}
 ```
