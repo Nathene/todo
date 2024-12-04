@@ -17,9 +17,11 @@
             <p class="mb-1">{{ .Description }}</p>
             <small>Due in {{ .DaysLeft }} days ({{ .EventDate.Format "2006-01-02" }})</small>
         </div>
+        {{ else }}
         <div class="list-group-item text-center">
             <em>No events coming up this week.</em>
         </div>
+        {{ end }}
     </div>
 
     <!-- Groups with Urgent Tickets -->
